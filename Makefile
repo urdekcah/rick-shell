@@ -1,5 +1,5 @@
 GCC := gcc
-OPT := -g -z relro -z noexecstack -z now -fPIE -fstack-protector-strong -Wall -Wextra
+OPT := -g0 -O3 -z relro -z noexecstack -z now -fPIE -fstack-protector-strong -Wall -Wextra
 LDFLAGS :=
 TARGET := shell
 
