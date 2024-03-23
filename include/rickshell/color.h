@@ -25,7 +25,6 @@
 #define ANSI_COLOR_BRIGHT_BOLD_MAGENTA "\x1b[1;95m"
 #define ANSI_COLOR_BRIGHT_BOLD_CYAN    "\x1b[1;96m"
 #define ANSI_COLOR_BRIGHT_BOLD_WHITE   "\x1b[1;97m"
-
 #define ANSI_BG_BLACK   "\x1b[40m"
 #define ANSI_BG_RED     "\x1b[41m"
 #define ANSI_BG_GREEN   "\x1b[42m"

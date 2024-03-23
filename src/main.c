@@ -20,12 +20,14 @@
 #include "rickshell/color.h"
 #include "rickshell/parse.h"
 #include "rickshell/release.h"
+#include "rickshell/job.h"
 
 extern char **builtin_str;
 extern int (*builtin_func[RICK_BCMD_LEN])(char **);
 extern int bufsize_builtin_str;
 
 #define PATH_ENV "PATH=/bin:/usr/bin"
+int redirect = 0, pipeline = 0, background = 0;
 
 void execute(char **args/*, int num_args*/) {
   int builtined = 0;
@@ -39,8 +41,7 @@ void execute(char **args/*, int num_args*/) {
     }
   }
   if (!builtined) {
-    int redirect = 0, pipeline = 0;
-    execute_command(args, 0, redirect, pipeline);
+    execute_command(args, background, redirect, pipeline);
   }
 }
 
@@ -67,13 +68,14 @@ int main() {
     char prompt[MAX_PATH_LEN + 50];
     snprintf(prompt, sizeof(prompt), ANSI_COLOR_BOLD_BLUE "%s@%s" ANSI_COLOR_BOLD_BLACK ":" ANSI_COLOR_RESET ANSI_COLOR_BOLD_YELLOW "%s" ANSI_COLOR_BOLD_RED "$" ANSI_COLOR_RESET " ", username, host, cwd);
     char *input = readline(prompt);
+    check_background_jobs();
     if (!input) {
       printf("\n");
       break;
     }
     if (strlen(input) > 0) {
       int num_args = 0;
-      char **args = parse_input(input, &num_args);
+      char **args = parse_input(input, &num_args, &redirect, &pipeline, &background);
       if (args == NULL) {
         free(args);
         free(input);
