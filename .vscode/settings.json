@@ -1,0 +1,14 @@
+{
+  "iis.configDir": "",
+  "files.associations": {
+    "*.wj": "woojin",
+    "*.h": "cpp",
+    "system_error": "c",
+    "random": "c",
+    "cstring": "c",
+    "limits": "c",
+    "memory": "c",
+    "numeric": "c",
+    "type_traits": "c"
+  }
+}
