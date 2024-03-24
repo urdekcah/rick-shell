@@ -32,4 +32,4 @@ Join us in shaping the future of `rickshell` and enjoy the journey through the v
 
 ---
 
-Thank you for your interest in `rickshell`. Let's build something amazing together.
+Thank you for your interest in `rickshell`. Let's build something amazing together!
