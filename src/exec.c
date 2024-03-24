@@ -24,7 +24,7 @@ void execute_command(char *args[], int background, int redirect, int pipeline) {
       execute_pipeline(args);
       exit(0); 
     } else if (execvp(args[0], args) == -1) {
-      perror(args[0]);
+      suggest_command(args[0]);
       exit(EXIT_FAILURE);
     }
   } else {
@@ -46,8 +46,8 @@ void execute_command(char *args[], int background, int redirect, int pipeline) {
         wpid = waitpid(pid, &status, WUNTRACED);
         if (wpid == -1) RICK_EFAIL("waitpid");
         if (WIFEXITED(status)) {
-          if (WEXITSTATUS(status) != 0)
-            fprintf(stderr, "Command failed with exit code %d\n", WEXITSTATUS(status));
+          // if (WEXITSTATUS(status) != 0)
+          //   fprintf(stderr, "Command failed with exit code %d\n", WEXITSTATUS(status));
         }
         else if (WIFSIGNALED(status)) printf("Child killed by signal %d\n", WTERMSIG(status));
       } while (!WIFEXITED(status) && !WIFSIGNALED(status));

@@ -61,12 +61,12 @@ void suggest_command(const char *cmd) {
   char *saveptr;
   for (token = strtok_r(path_copy, ":", &saveptr); token != NULL; token = strtok_r(NULL, ":", &saveptr))
     explore_directory(token, cmd, &suggestions, &num_suggestions, &capacity);
-  if (num_suggestions == 0) {printf("%s: command not found\n", cmd);}
+  if (num_suggestions == 0) {fprintf(stderr, "%s: command not found\n", cmd);}
   else {
-    printf("Command '%s' not found, did you mean:\n", cmd);
+    fprintf(stderr, "Command '%s' not found, did you mean:\n", cmd);
     for (int i = 0; i < num_suggestions; i++)
-      printf("  command '%s'\n", suggestions[i]);
-    printf("Try: sudo apt install <package-name>\n");
+      fprintf(stderr, "  command '%s'\n", suggestions[i]);
+    fprintf(stderr, "Try: sudo apt install <package-name>\n");
   }
   for (int i = 0; i < num_suggestions; i++)
     free(suggestions[i]);
