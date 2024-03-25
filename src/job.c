@@ -25,7 +25,7 @@ int find_available_job_id() {
 }
 
 void add_job(pid_t pid, const char* command) {
-  check_background_jobs();
+  if (job_counter>0) check_background_jobs();
   job* new_job = (job*)malloc(sizeof(job));
   if (!new_job) RICK_EFAIL("malloc");
   new_job->id = find_available_job_id();

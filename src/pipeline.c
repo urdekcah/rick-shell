@@ -9,6 +9,8 @@
 #include "rickshell/error.h"
 #include "rickshell/pipeline.h"
 #include "rickshell/completion.h"
+#include "rickshell/exec.h"
+#include "rickshell/parse.h"
 
 char **split_args(char *args[], int start, int end) {
   int length = end - start;
@@ -18,12 +20,13 @@ char **split_args(char *args[], int start, int end) {
   return new_args;
 }
 
-void execute_pipeline(char *args1[]) {
+int execute_pipeline(char *args1[]) {
   int fd[2];
   int in = 0;
   int start = 0;
   int i, status;
   pid_t pid/*, wpid*/;
+  int nargs = 0;
   for (i = 0; args1[i] != NULL; i++) {
     if (strcmp(args1[i], "|") == 0) {
       args1[i] = NULL;
@@ -31,16 +34,15 @@ void execute_pipeline(char *args1[]) {
       if (pipe(fd) == -1) RICK_EFAIL("pipe");
       pid = fork();
       if (pid == -1) RICK_EFAIL("fork");
+      exec_option_t opt;
+      parse_input_args(cmd, &nargs, &opt);
       if (pid == 0) {
         close(fd[0]);
         dup2(in, STDIN_FILENO);
         if (in != 0) close(in);
         dup2(fd[1], STDOUT_FILENO);
         close(fd[1]);
-        if (execvp(cmd[0], cmd) == -1) {
-          suggest_command(cmd[0]);
-          exit(EXIT_FAILURE);
-        }
+        execute_with_pid(pid, cmd, &opt);
       } else {
         close(fd[1]);
         if (in != 0) close(in);
@@ -61,13 +63,13 @@ void execute_pipeline(char *args1[]) {
     if (pid == 0) {
       dup2(in, STDIN_FILENO);
       if (in != 0) close(in);
-      if (execvp(cmd[0], cmd) == -1) {
-        suggest_command(cmd[0]);
-        exit(EXIT_FAILURE);
-      }
+      exec_option_t opt;
+      parse_input_args(cmd, &nargs, &opt);
+      execute_with_pid(pid, cmd, &opt);
     } else {
       if (in != 0) close(in);
       waitpid(pid, &status, 0);
     }
   }
+  return 0;
 }

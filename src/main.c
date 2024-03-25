@@ -22,28 +22,7 @@
 #include "rickshell/release.h"
 #include "rickshell/job.h"
 
-extern char **builtin_str;
-extern int (*builtin_func[RICK_BCMD_LEN])(char **);
-extern int bufsize_builtin_str;
-
 #define PATH_ENV "PATH=/bin:/usr/bin"
-int redirect = 0, pipeline = 0, background = 0;
-
-void execute(char **args/*, int num_args*/) {
-  int builtined = 0;
-  for (int i = 0; i < bufsize_builtin_str; i++) {
-    if (strcmp(args[0], builtin_str[i]) == 0) {
-      builtined = 1;
-      int status = (*builtin_func[i])(args);
-      if (status != 0 && status != RE_NEED_EXIT) 
-        fprintf(stderr, "Command failed with exit code %d\n", status);
-      break;
-    }
-  }
-  if (!builtined) {
-    execute_command(args, background, redirect, pipeline);
-  }
-}
 
 int main() {
   setlocale(LC_ALL, "");
@@ -75,16 +54,24 @@ int main() {
     }
     if (strlen(input) > 0) {
       int num_args = 0;
-      char **args = parse_input(input, &num_args, &redirect, &pipeline, &background);
-      if (args == NULL) {
-        free(args);
+      exec_option_t* opt = (exec_option_t*)calloc(1, sizeof(exec_option_t));
+      if (!opt) {
+        fprintf(stderr, "Memory allocation failed\n");
         free(input);
         continue;
       }
-      execute(args/*, num_args*/);
+      char **args = parse_input(input, &num_args, opt);
+      if (args == NULL) {
+        free(args);
+        free(input);
+        free(opt);
+        continue;
+      }
+      execute_command(args, opt);
       add_history(input);
       for (int i = 0; i < num_args; i++) free(args[i]);
       free(args);
+      free(opt);
     }
     free(input);
   }
